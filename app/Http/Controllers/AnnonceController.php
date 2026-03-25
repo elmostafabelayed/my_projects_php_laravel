@@ -4,10 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\AnnonceRequest;
 use App\Models\Annonce;
-use Illuminate\Database\Eloquent\Builder
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Database\Eloquent\Builder;
 
 use function Symfony\Component\Clock\now;
 
@@ -31,9 +32,11 @@ class AnnonceController extends Controller
             $query->where('ville', $request->ville);
         };
 
-        if ($request->has('rech') && !empty($request->rech)) {
-            $query->where(function(Builder $q)use($rech){
-
+        if ($request->has('rech') && $request->rech) {
+            $recherch = $request->rech;
+            $query->where(function ($q) use ($recherch) {
+                $q->where('titre','like','%'.$recherch.'%')
+                ->orWhere('description','like','%'.$recherch.'%');
             });
         };
         $villes = Annonce::select('ville')->distinct()->get();
